@@ -1,0 +1,110 @@
+<div class="template-list-container">
+  <div class="header">
+    <h1>Message Templates</h1>
+    <button mat-raised-button color="primary" [routerLink]="['/messages/new']">
+      <mat-icon>add</mat-icon> New Template
+    </button>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading templates...</p>
+  </div>
+
+  <div class="no-data" *ngIf="!loading && !templates.length">
+    <p>
+      No message templates found. Add some by clicking the "New Template" button
+      above.
+    </p>
+  </div>
+
+  <div class="template-grid" *ngIf="!loading && templates.length">
+    <mat-card class="template-card" *ngFor="let template of templates">
+      <mat-card-header>
+        <mat-card-title>{{ template.name }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ template.type | titlecase }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="subject">
+          <strong>Subject:</strong> {{ template.subject }}
+        </div>
+        <div class="message-preview">
+          <p>
+            {{ template.body | slice : 0 : 150
+            }}{{ template.body.length > 150 ? "..." : "" }}
+          </p>
+        </div>
+        <div class="created-at">
+          <small>Created: {{ template.createdAt | date }}</small>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button
+          mat-icon-button
+          color="primary"
+          [routerLink]="['/messages/edit', template.id]"
+          matTooltip="Edit"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="primary"
+          [routerLink]="['/messages/send', template.id]"
+          matTooltip="Send Message"
+        >
+          <mat-icon>send</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="duplicateTemplate(template)"
+          matTooltip="Duplicate"
+        >
+          <mat-icon>content_copy</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="confirmDelete(template)"
+          matTooltip="Delete"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <div class="type-summary" *ngIf="!loading && templates.length">
+    <h3>Template Types</h3>
+    <div class="template-stats">
+      <div class="stat-item">
+        <mat-chip color="primary" selected>
+          Invitation: {{ getCountByType("invitation") }}
+        </mat-chip>
+      </div>
+      <div class="stat-item">
+        <mat-chip color="primary" selected>
+          Reminder: {{ getCountByType("reminder") }}
+        </mat-chip>
+      </div>
+      <div class="stat-item">
+        <mat-chip color="primary" selected>
+          Confirmation: {{ getCountByType("confirmation") }}
+        </mat-chip>
+      </div>
+      <div class="stat-item">
+        <mat-chip color="primary" selected>
+          Location: {{ getCountByType("location") }}
+        </mat-chip>
+      </div>
+      <div class="stat-item">
+        <mat-chip color="primary" selected>
+          Custom: {{ getCountByType("custom") }}
+        </mat-chip>
+      </div>
+    </div>
+  </div>
+</div>

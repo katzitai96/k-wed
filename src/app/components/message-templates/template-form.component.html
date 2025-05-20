@@ -1,0 +1,152 @@
+<div class="template-form-container">
+  <div class="header">
+    <h1>{{ isEditMode ? "Edit" : "Create" }} Message Template</h1>
+    <button mat-button color="primary" routerLink="/messages">
+      <mat-icon>arrow_back</mat-icon> Back to Templates
+    </button>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>{{ isEditMode ? "Loading template..." : "Preparing form..." }}</p>
+  </div>
+
+  <mat-card *ngIf="!loading">
+    <mat-card-content>
+      <form
+        [formGroup]="templateForm"
+        (ngSubmit)="onSubmit()"
+        class="form-container"
+      >
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Template Name</mat-label>
+            <input
+              matInput
+              formControlName="name"
+              placeholder="Enter a descriptive name for this template"
+              required
+            />
+            <mat-error *ngIf="templateForm.get('name')?.hasError('required')">
+              Template name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Subject</mat-label>
+            <input
+              matInput
+              formControlName="subject"
+              placeholder="Enter the subject/title of the message"
+              required
+            />
+            <mat-error
+              *ngIf="templateForm.get('subject')?.hasError('required')"
+            >
+              Subject is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Template Type</mat-label>
+            <mat-select formControlName="type" required>
+              <mat-option value="invitation">Invitation</mat-option>
+              <mat-option value="reminder">Reminder</mat-option>
+              <mat-option value="confirmation">Confirmation</mat-option>
+              <mat-option value="location">Location Details</mat-option>
+              <mat-option value="custom">Custom</mat-option>
+            </mat-select>
+            <mat-error *ngIf="templateForm.get('type')?.hasError('required')">
+              Template type is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Message Content</mat-label>
+            <textarea
+              matInput
+              formControlName="body"
+              placeholder="Enter the message content"
+              rows="12"
+              required
+            ></textarea>
+            <mat-hint>
+              You can use variables like {{ firstName }}, {{ lastName }},
+              {{ numberOfGuests }} which will be replaced with actual values
+              when sending the message.
+            </mat-hint>
+            <mat-error *ngIf="templateForm.get('body')?.hasError('required')">
+              Message content is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="template-variables">
+          <h3>Available Variables</h3>
+          <div class="chip-list">
+            <mat-chip
+              color="primary"
+              (click)="insertVariable('firstName')"
+              selected="false"
+            >
+              {{ firstName }}
+            </mat-chip>
+            <mat-chip
+              color="primary"
+              (click)="insertVariable('lastName')"
+              selected="false"
+            >
+              {{ lastName }}
+            </mat-chip>
+            <mat-chip
+              color="primary"
+              (click)="insertVariable('numberOfGuests')"
+              selected="false"
+            >
+              {{ numberOfGuests }}
+            </mat-chip>
+            <mat-chip
+              color="primary"
+              (click)="insertVariable('phoneNumber')"
+              selected="false"
+            >
+              {{ phoneNumber }}
+            </mat-chip>
+            <mat-chip
+              color="primary"
+              (click)="insertVariable('email')"
+              selected="false"
+            >
+              {{ email }}
+            </mat-chip>
+          </div>
+          <p class="chip-instruction">
+            Click on a variable to insert it at the cursor position in the
+            message content.
+          </p>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/messages">
+            Cancel
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="templateForm.invalid || submitting"
+          >
+            <mat-icon>{{ isEditMode ? "save" : "add" }}</mat-icon>
+            {{ isEditMode ? "Update" : "Save" }} Template
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,440 @@
+<div class="responses-container">
+  <div class="header">
+    <h1>RSVP Responses</h1>
+    <div class="header-actions">
+      <button mat-raised-button color="accent" (click)="exportResponsesData()">
+        <mat-icon>download</mat-icon> Export Data
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        [routerLink]="['/invitees/new']"
+      >
+        <mat-icon>person_add</mat-icon> Add Invitee
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading RSVP data...</p>
+  </div>
+
+  <div class="stats-cards" *ngIf="!loading">
+    <mat-card class="stats-card">
+      <mat-card-content>
+        <div class="stat-number">{{ getTotalInvitees() }}</div>
+        <div class="stat-label">Total Invitees</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stats-card confirmed">
+      <mat-card-content>
+        <div class="stat-number">{{ getInviteesByStatus("confirmed") }}</div>
+        <div class="stat-label">Confirmed</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stats-card pending">
+      <mat-card-content>
+        <div class="stat-number">{{ getInviteesByStatus("pending") }}</div>
+        <div class="stat-label">Pending</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stats-card declined">
+      <mat-card-content>
+        <div class="stat-number">{{ getInviteesByStatus("declined") }}</div>
+        <div class="stat-label">Declined</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stats-card maybe">
+      <mat-card-content>
+        <div class="stat-number">{{ getInviteesByStatus("maybe") }}</div>
+        <div class="stat-label">Maybe</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stats-card total-guests">
+      <mat-card-content>
+        <div class="stat-number">{{ getTotalGuests() }}</div>
+        <div class="stat-label">Total Guests</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="response-percentage" *ngIf="!loading && getTotalInvitees() > 0">
+    <h3>Response Rate: {{ getResponseRate() }}%</h3>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width]="getResponseRate() + '%'"></div>
+    </div>
+  </div>
+
+  <mat-tab-group
+    *ngIf="!loading"
+    mat-stretch-tabs="false"
+    mat-align-tabs="start"
+  >
+    <mat-tab label="All ({{ invitees.length }})">
+      <ng-template matTabContent>
+        <div class="invitees-list">
+          <mat-card
+            *ngFor="let invitee of invitees"
+            class="invitee-card"
+            [ngClass]="{
+              'status-confirmed': invitee.rsvpStatus === 'confirmed',
+              'status-declined': invitee.rsvpStatus === 'declined',
+              'status-pending': invitee.rsvpStatus === 'pending',
+              'status-maybe': invitee.rsvpStatus === 'maybe'
+            }"
+          >
+            <mat-card-header>
+              <mat-card-title
+                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+              >
+              <mat-card-subtitle>
+                {{ invitee.relation | titlecase }} •
+                {{ invitee.numberOfGuests }} Guest(s)
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p>
+                <strong>Status:</strong>
+                <span class="status-chip {{ invitee.rsvpStatus }}">{{
+                  invitee.rsvpStatus | titlecase
+                }}</span>
+              </p>
+              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p *ngIf="invitee.email">
+                <strong>Email:</strong> {{ invitee.email }}
+              </p>
+              <p *ngIf="invitee.dietaryRestrictions">
+                <strong>Dietary Restrictions:</strong>
+                {{ invitee.dietaryRestrictions }}
+              </p>
+              <p *ngIf="invitee.additionalInfo">
+                <strong>Additional Info:</strong>
+                <span class="additional-info">{{
+                  invitee.additionalInfo
+                }}</span>
+              </p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button
+                mat-button
+                color="primary"
+                [routerLink]="['/invitees/edit', invitee.id]"
+              >
+                <mat-icon>edit</mat-icon> Edit
+              </button>
+              <button
+                mat-button
+                (click)="sendMessage(invitee)"
+                [disabled]="sendingMessage === invitee.id"
+              >
+                <mat-icon>message</mat-icon> Message
+              </button>
+            </mat-card-actions>
+            <div
+              *ngIf="sendingMessage === invitee.id"
+              class="sending-indicator"
+            >
+              <mat-spinner diameter="20"></mat-spinner> Sending...
+            </div>
+          </mat-card>
+
+          <div class="no-results" *ngIf="invitees.length === 0">
+            <p>No invitees found.</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Confirmed ({{ getInviteesByStatus('confirmed') }})">
+      <ng-template matTabContent>
+        <div class="invitees-list">
+          <mat-card
+            *ngFor="let invitee of getFilteredInvitees('confirmed')"
+            class="invitee-card status-confirmed"
+          >
+            <mat-card-header>
+              <mat-card-title
+                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+              >
+              <mat-card-subtitle>
+                {{ invitee.relation | titlecase }} •
+                {{ invitee.numberOfGuests }} Guest(s)
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p *ngIf="invitee.email">
+                <strong>Email:</strong> {{ invitee.email }}
+              </p>
+              <p *ngIf="invitee.dietaryRestrictions">
+                <strong>Dietary Restrictions:</strong>
+                {{ invitee.dietaryRestrictions }}
+              </p>
+              <p *ngIf="invitee.additionalInfo">
+                <strong>Additional Info:</strong>
+                <span class="additional-info">{{
+                  invitee.additionalInfo
+                }}</span>
+              </p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button
+                mat-button
+                color="primary"
+                [routerLink]="['/invitees/edit', invitee.id]"
+              >
+                <mat-icon>edit</mat-icon> Edit
+              </button>
+              <button
+                mat-button
+                (click)="sendMessage(invitee)"
+                [disabled]="sendingMessage === invitee.id"
+              >
+                <mat-icon>message</mat-icon> Message
+              </button>
+            </mat-card-actions>
+            <div
+              *ngIf="sendingMessage === invitee.id"
+              class="sending-indicator"
+            >
+              <mat-spinner diameter="20"></mat-spinner> Sending...
+            </div>
+          </mat-card>
+
+          <div
+            class="no-results"
+            *ngIf="getFilteredInvitees('confirmed').length === 0"
+          >
+            <p>No confirmed invitees found.</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Pending ({{ getInviteesByStatus('pending') }})">
+      <ng-template matTabContent>
+        <div class="invitees-list">
+          <mat-card
+            *ngFor="let invitee of getFilteredInvitees('pending')"
+            class="invitee-card status-pending"
+          >
+            <mat-card-header>
+              <mat-card-title
+                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+              >
+              <mat-card-subtitle>
+                {{ invitee.relation | titlecase }} •
+                {{ invitee.numberOfGuests }} Guest(s)
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p *ngIf="invitee.email">
+                <strong>Email:</strong> {{ invitee.email }}
+              </p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button
+                mat-button
+                color="primary"
+                [routerLink]="['/invitees/edit', invitee.id]"
+              >
+                <mat-icon>edit</mat-icon> Edit
+              </button>
+              <button
+                mat-button
+                color="accent"
+                (click)="sendReminder(invitee)"
+                [disabled]="sendingMessage === invitee.id"
+              >
+                <mat-icon>notifications</mat-icon> Send Reminder
+              </button>
+            </mat-card-actions>
+            <div
+              *ngIf="sendingMessage === invitee.id"
+              class="sending-indicator"
+            >
+              <mat-spinner diameter="20"></mat-spinner> Sending...
+            </div>
+          </mat-card>
+
+          <div
+            class="no-results"
+            *ngIf="getFilteredInvitees('pending').length === 0"
+          >
+            <p>No pending invitees found.</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Declined ({{ getInviteesByStatus('declined') }})">
+      <!-- Similar content for declined -->
+      <ng-template matTabContent>
+        <div class="invitees-list">
+          <mat-card
+            *ngFor="let invitee of getFilteredInvitees('declined')"
+            class="invitee-card status-declined"
+          >
+            <mat-card-header>
+              <mat-card-title
+                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+              >
+              <mat-card-subtitle>
+                {{ invitee.relation | titlecase }}
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p *ngIf="invitee.email">
+                <strong>Email:</strong> {{ invitee.email }}
+              </p>
+              <p *ngIf="invitee.additionalInfo">
+                <strong>Additional Info:</strong>
+                <span class="additional-info">{{
+                  invitee.additionalInfo
+                }}</span>
+              </p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button
+                mat-button
+                color="primary"
+                [routerLink]="['/invitees/edit', invitee.id]"
+              >
+                <mat-icon>edit</mat-icon> Edit
+              </button>
+              <button
+                mat-button
+                (click)="sendMessage(invitee)"
+                [disabled]="sendingMessage === invitee.id"
+              >
+                <mat-icon>message</mat-icon> Message
+              </button>
+            </mat-card-actions>
+            <div
+              *ngIf="sendingMessage === invitee.id"
+              class="sending-indicator"
+            >
+              <mat-spinner diameter="20"></mat-spinner> Sending...
+            </div>
+          </mat-card>
+
+          <div
+            class="no-results"
+            *ngIf="getFilteredInvitees('declined').length === 0"
+          >
+            <p>No declined invitees found.</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Maybe ({{ getInviteesByStatus('maybe') }})">
+      <!-- Similar content for maybe -->
+      <ng-template matTabContent>
+        <div class="invitees-list">
+          <mat-card
+            *ngFor="let invitee of getFilteredInvitees('maybe')"
+            class="invitee-card status-maybe"
+          >
+            <mat-card-header>
+              <mat-card-title
+                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+              >
+              <mat-card-subtitle>
+                {{ invitee.relation | titlecase }} •
+                {{ invitee.numberOfGuests }} Guest(s)
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p *ngIf="invitee.email">
+                <strong>Email:</strong> {{ invitee.email }}
+              </p>
+              <p *ngIf="invitee.additionalInfo">
+                <strong>Additional Info:</strong>
+                <span class="additional-info">{{
+                  invitee.additionalInfo
+                }}</span>
+              </p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button
+                mat-button
+                color="primary"
+                [routerLink]="['/invitees/edit', invitee.id]"
+              >
+                <mat-icon>edit</mat-icon> Edit
+              </button>
+              <button
+                mat-button
+                (click)="sendFollowUp(invitee)"
+                [disabled]="sendingMessage === invitee.id"
+              >
+                <mat-icon>question_answer</mat-icon> Follow Up
+              </button>
+            </mat-card-actions>
+            <div
+              *ngIf="sendingMessage === invitee.id"
+              class="sending-indicator"
+            >
+              <mat-spinner diameter="20"></mat-spinner> Sending...
+            </div>
+          </mat-card>
+
+          <div
+            class="no-results"
+            *ngIf="getFilteredInvitees('maybe').length === 0"
+          >
+            <p>No "maybe" invitees found.</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+
+  <div class="bulk-actions" *ngIf="!loading">
+    <h3>Bulk Actions</h3>
+    <div class="bulk-actions-form">
+      <mat-form-field>
+        <mat-label>Select Template</mat-label>
+        <mat-select [(ngModel)]="selectedTemplate">
+          <mat-option [value]="null">-- Select Template --</mat-option>
+          <mat-option
+            *ngFor="let template of messageTemplates"
+            [value]="template"
+          >
+            {{ template.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Send To</mat-label>
+        <mat-select [(ngModel)]="selectedGroup">
+          <mat-option value="all">All Invitees</mat-option>
+          <mat-option value="pending">Pending Responses</mat-option>
+          <mat-option value="confirmed">Confirmed</mat-option>
+          <mat-option value="declined">Declined</mat-option>
+          <mat-option value="maybe">Maybe</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="!selectedTemplate || bulkSending"
+        (click)="sendBulkMessages()"
+      >
+        <mat-icon>send</mat-icon> Send Messages
+      </button>
+    </div>
+    <div class="bulk-sending" *ngIf="bulkSending">
+      <mat-spinner diameter="30"></mat-spinner>
+      <span>Sending bulk messages... ({{ bulkProgress }}/{{ bulkTotal }})</span>
+    </div>
+  </div>
+</div>

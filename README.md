@@ -1,34 +1,83 @@
-# WeddingRsvp
+# Wedding RSVP Management Application
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.12.
+A comprehensive wedding RSVP management application built with Angular, TypeScript, Twilio for WhatsApp messaging, and Supabase for database storage.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- **WhatsApp Integration**: Send and receive RSVP messages, invitations, and wedding information directly through WhatsApp
+- **Invitee Management**: Track guests, their relationships, contact details, and RSVP status
+- **Response Tracking**: Monitor responses and follow up with non-respondents
+- **Dashboard View**: Get an overview of confirmed guests, pending responses, and important metrics
+- **Excel Export**: Export guest data for planning and coordination
+- **Message Templates**: Create and manage reusable message templates for different purposes
+
+## Tech Stack
+
+- **Frontend**: Angular, Angular Material, TypeScript
+- **Backend**: Node.js, Express
+- **Database**: Supabase (PostgreSQL)
+- **Messaging**: Twilio WhatsApp API
+- **Reporting**: Excel.js for data export
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v16 or later)
+- Angular CLI
+- Supabase Account
+- Twilio Account with WhatsApp capability
+
+### Environment Setup
+
+1. Copy `src/environments/environment.example.ts` to `src/environments/environment.ts` and `src/environments/environment.prod.ts`
+2. Update both files with your own credentials:
+   - Supabase URL and key
+   - Twilio account SID, auth token, and phone number
+   - API URL
+
+> **IMPORTANT**: Never commit environment files with real credentials to the repository. They are included in the `.gitignore` file to prevent accidental commits.
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up the database:
+   ```bash
+   npm run setup:db
+   ```
+4. Configure environment variables (see SETUP.md for detailed instructions)
+5. Run the application:
+   ```bash
+   npm run start:dev
+   ```
+
+## Development
+
+### Development server
+
+To start the Angular development server only:
 
 ```bash
-ng serve
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+To start both the Angular app and Express server concurrently:
 
 ```bash
-ng generate component component-name
+npm run start:dev
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Testing Twilio Integration
+
+To test WhatsApp messaging functionality:
 
 ```bash
-ng generate --help
+npm run test:twilio
 ```
-
-## Building
-
-To build the project run:
 
 ```bash
 ng build

@@ -1,0 +1,199 @@
+<div class="invitee-form-container">
+  <div class="header">
+    <h1>{{ isEditMode ? "Edit" : "Add" }} Invitee</h1>
+    <button mat-button color="primary" routerLink="/invitees">
+      <mat-icon>arrow_back</mat-icon> Back to Invitees
+    </button>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>
+      {{ isEditMode ? "Loading invitee data..." : "Preparing form..." }}
+    </p>
+  </div>
+
+  <mat-card *ngIf="!loading">
+    <mat-card-content>
+      <form
+        [formGroup]="inviteeForm"
+        (ngSubmit)="submitForm()"
+        class="form-container"
+      >
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input
+              matInput
+              formControlName="firstName"
+              placeholder="Enter first name"
+              required
+            />
+            <mat-error
+              *ngIf="inviteeForm.get('firstName')?.hasError('required')"
+            >
+              First name is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input
+              matInput
+              formControlName="lastName"
+              placeholder="Enter last name"
+              required
+            />
+            <mat-error
+              *ngIf="inviteeForm.get('lastName')?.hasError('required')"
+            >
+              Last name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Phone Number</mat-label>
+            <input
+              matInput
+              formControlName="phoneNumber"
+              placeholder="Enter phone number (e.g. +123456789)"
+              required
+            />
+            <mat-hint>Include country code (e.g. +1 for USA)</mat-hint>
+            <mat-error
+              *ngIf="inviteeForm.get('phoneNumber')?.hasError('required')"
+            >
+              Phone number is required
+            </mat-error>
+            <mat-error
+              *ngIf="inviteeForm.get('phoneNumber')?.hasError('pattern')"
+            >
+              Phone number must include + and country code
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input
+              matInput
+              formControlName="email"
+              placeholder="Enter email address"
+            />
+            <mat-error *ngIf="inviteeForm.get('email')?.hasError('email')">
+              Please enter a valid email address
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Number of Guests</mat-label>
+            <input
+              matInput
+              formControlName="numberOfGuests"
+              placeholder="Enter number of guests"
+              type="number"
+              required
+              min="1"
+            />
+            <mat-error
+              *ngIf="inviteeForm.get('numberOfGuests')?.hasError('required')"
+            >
+              Number of guests is required
+            </mat-error>
+            <mat-error
+              *ngIf="inviteeForm.get('numberOfGuests')?.hasError('min')"
+            >
+              Number of guests must be at least 1
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Relation</mat-label>
+            <mat-select formControlName="relation" required>
+              <mat-option value="family">Family</mat-option>
+              <mat-option value="friend">Friend</mat-option>
+              <mat-option value="colleague">Colleague</mat-option>
+              <mat-option value="other">Other</mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="inviteeForm.get('relation')?.hasError('required')"
+            >
+              Relation is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>RSVP Status</mat-label>
+            <mat-select formControlName="rsvpStatus" required>
+              <mat-option value="pending">Pending</mat-option>
+              <mat-option value="confirmed">Confirmed</mat-option>
+              <mat-option value="declined">Declined</mat-option>
+              <mat-option value="maybe">Maybe</mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="inviteeForm.get('rsvpStatus')?.hasError('required')"
+            >
+              RSVP Status is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row full-width">
+          <mat-form-field appearance="outline">
+            <mat-label>Dietary Restrictions</mat-label>
+            <textarea
+              matInput
+              formControlName="dietaryRestrictions"
+              placeholder="Enter any dietary restrictions"
+              rows="2"
+            ></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row full-width">
+          <mat-form-field appearance="outline">
+            <mat-label>Special Requests</mat-label>
+            <textarea
+              matInput
+              formControlName="specialRequests"
+              placeholder="Enter any special requests"
+              rows="2"
+            ></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row full-width">
+          <mat-form-field appearance="outline">
+            <mat-label>Additional Information</mat-label>
+            <textarea
+              matInput
+              formControlName="additionalInfo"
+              placeholder="Enter any additional information"
+              rows="3"
+            ></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/invitees">
+            Cancel
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="inviteeForm.invalid || submitting"
+          >
+            <mat-icon>{{ isEditMode ? "save" : "add" }}</mat-icon>
+            {{ isEditMode ? "Update" : "Save" }} Invitee
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
