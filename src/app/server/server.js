@@ -65,10 +65,10 @@ app.post("/api/send-message", async (req, res) => {
       .from("message_history")
       .insert([
         {
-          inviteeId: req.body.inviteeId || null,
-          templateId: req.body.templateId || null,
-          messageBody: body,
-          sentAt: new Date(),
+          invitee_id: req.body.inviteeId || null,
+          template_id: req.body.templateId || null,
+          message_body: body,
+          sent_at: new Date(),
           status: "pending",
         },
       ])
@@ -110,10 +110,10 @@ app.post("/api/send-bulk-messages", async (req, res) => {
           .from("message_history")
           .insert([
             {
-              inviteeId: msgData.inviteeId || null,
-              templateId: msgData.templateId || null,
-              messageBody: msgData.body,
-              sentAt: new Date(),
+              invitee_id: msgData.inviteeId || null,
+              template_id: msgData.templateId || null,
+              message_body: msgData.body,
+              sent_at: new Date(),
               status: "pending",
             },
           ])
@@ -155,10 +155,10 @@ app.post("/api/schedule-message", async (req, res) => {
         {
           to,
           body,
-          inviteeId: inviteeId || null,
-          templateId: templateId || null,
-          scheduledDate,
-          createdAt: new Date(),
+          invitee_id: inviteeId || null,
+          template_id: templateId || null,
+          scheduled_date,
+          created_at: new Date(),
         },
       ])
       .select();
@@ -177,6 +177,18 @@ app.post("/api/schedule-message", async (req, res) => {
 // Webhook for receiving WhatsApp replies
 app.post("/api/webhook-response", async (req, res) => {
   try {
+    // Log the incoming request for debugging
+    console.log("Webhook request received:", {
+      headers: req.headers,
+      body: req.body,
+    });
+
+    // Validate that we received a proper request
+    if (!req.body) {
+      console.error("Webhook received empty request body");
+      return res.status(400).send("Bad Request: Empty body");
+    }
+
     const twilioSignature = req.headers["x-twilio-signature"];
 
     // Validate Twilio request
@@ -190,18 +202,31 @@ app.post("/api/webhook-response", async (req, res) => {
     if (!requestIsValid && process.env.NODE_ENV === "production") {
       return res.status(403).send("Forbidden");
     }
-
-    const from = req.body.From;
-    const body = req.body.Body.trim();
-
+    const from = req.body.From || "unknown";
+    const body = req.body.Body ? req.body.Body.trim() : "";
     console.log(`Received message from ${from}: ${body}`);
 
     // Look up invitee by phone number
-    const formattedPhone = from.replace("whatsapp:", "");
+    let formattedPhone = from;
+
+    // Remove WhatsApp prefix if present
+    if (typeof from === "string") {
+      formattedPhone = from.replace("whatsapp:", "");
+    } else {
+      console.error("Invalid 'From' field in webhook:", from);
+      formattedPhone = "";
+    }
+
+    // Only proceed with database lookup if we have a valid phone number
+    if (!formattedPhone) {
+      console.error("Unable to extract valid phone number from webhook");
+      return res.status(400).send("Bad Request: Invalid phone number");
+    }
+
     const { data: invitees, error: lookupError } = await supabase
       .from("invitees")
       .select("*")
-      .eq("phoneNumber", formattedPhone)
+      .eq("phone_number", formattedPhone)
       .limit(1);
 
     if (lookupError) {
@@ -239,13 +264,13 @@ app.post("/api/webhook-response", async (req, res) => {
         const { error: updateError } = await supabase
           .from("invitees")
           .update({
-            rsvpStatus,
-            additionalInfo: invitee.additionalInfo
+            rsvp_status: rsvpStatus,
+            additional_info: invitee.additional_info
               ? `${
-                  invitee.additionalInfo
+                  invitee.additional_info
                 }\n${new Date().toISOString()}: ${body}`
               : `${new Date().toISOString()}: ${body}`,
-            updatedAt: new Date(),
+            updated_at: new Date(),
           })
           .eq("id", invitee.id);
 
@@ -259,13 +284,13 @@ app.post("/api/webhook-response", async (req, res) => {
         .from("message_history")
         .insert([
           {
-            inviteeId: invitee.id,
-            messageBody: body,
-            sentAt: new Date(),
+            invitee_id: invitee.id,
+            message_body: body,
+            sent_at: new Date(),
             status: "delivered",
-            responseReceived: true,
-            responseText: body,
-            responseReceivedAt: new Date(),
+            response_received: true,
+            response_text: body,
+            response_received_at: new Date(),
           },
         ]);
 
@@ -274,15 +299,32 @@ app.post("/api/webhook-response", async (req, res) => {
       }
     }
 
-    // Send acknowledgment response
-    const twiml = new twilio.twiml.MessagingResponse();
-    twiml.message("Thanks for your response! We've recorded your RSVP. 💕");
+    try {
+      // Send acknowledgment response
+      const twiml = new twilio.twiml.MessagingResponse();
+      twiml.message("Thanks for your response! We've recorded your RSVP. 💕");
 
-    res.type("text/xml");
-    res.send(twiml.toString());
+      res.type("text/xml");
+      res.send(twiml.toString());
+    } catch (responseError) {
+      console.error("Error sending acknowledgment response:", responseError);
+      res.status(500).send("Error processing webhook");
+    }
   } catch (error) {
     console.error("Error handling webhook response:", error);
-    res.status(500).send("Error processing webhook");
+
+    // Log detailed error information
+    console.error({
+      message: error.message,
+      stack: error.stack,
+      requestBody: req.body,
+      requestHeaders: req.headers,
+    });
+
+    // Make sure we respond even if there's an error
+    if (!res.headersSent) {
+      res.status(500).send("Error processing webhook");
+    }
   }
 });
 

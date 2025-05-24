@@ -14,17 +14,17 @@ export enum RSVPStatus {
 
 export interface Invitee {
   id?: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
   email?: string;
-  numberOfGuests: number;
+  number_of_guests: number;
   relation: RelationType;
-  rsvpStatus: RSVPStatus;
-  dietaryRestrictions?: string;
-  specialRequests?: string;
-  lastContacted?: Date;
-  additionalInfo?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  rsvp_status: RSVPStatus;
+  dietary_restrictions?: string;
+  special_requests?: string;
+  last_contacted?: Date;
+  additional_info?: string;
+  created_at?: Date;
+  updated_at?: Date;
 }

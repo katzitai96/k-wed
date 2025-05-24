@@ -50,19 +50,19 @@ export class InviteeListComponent implements OnInit {
 
   // Computed properties for status counts
   get confirmedCount(): number {
-    return this.invitees.filter((i) => i.rsvpStatus === 'confirmed').length;
+    return this.invitees.filter((i) => i.rsvp_status === 'confirmed').length;
   }
 
   get pendingCount(): number {
-    return this.invitees.filter((i) => i.rsvpStatus === 'pending').length;
+    return this.invitees.filter((i) => i.rsvp_status === 'pending').length;
   }
 
   get maybeCount(): number {
-    return this.invitees.filter((i) => i.rsvpStatus === 'maybe').length;
+    return this.invitees.filter((i) => i.rsvp_status === 'maybe').length;
   }
 
   get declinedCount(): number {
-    return this.invitees.filter((i) => i.rsvpStatus === 'declined').length;
+    return this.invitees.filter((i) => i.rsvp_status === 'declined').length;
   }
 
   // Table configuration
@@ -119,16 +119,16 @@ export class InviteeListComponent implements OnInit {
       const search = this.searchText.toLowerCase();
       filtered = filtered.filter(
         (invitee) =>
-          `${invitee.firstName} ${invitee.lastName}`
+          `${invitee.first_name} ${invitee.last_name}`
             .toLowerCase()
-            .includes(search) || invitee.phoneNumber.includes(search)
+            .includes(search) || invitee.phone_number.includes(search)
       );
     }
 
     // Apply status filter
     if (this.statusFilter !== 'all') {
       filtered = filtered.filter(
-        (invitee) => invitee.rsvpStatus === this.statusFilter
+        (invitee) => invitee.rsvp_status === this.statusFilter
       );
     }
 
@@ -166,12 +166,12 @@ export class InviteeListComponent implements OnInit {
       switch (sort.active) {
         case 'name':
           return this.compare(
-            `${a.firstName} ${a.lastName}`,
-            `${b.firstName} ${b.lastName}`,
+            `${a.first_name} ${a.last_name}`,
+            `${b.first_name} ${b.last_name}`,
             isAsc
           );
         case 'guests':
-          return this.compare(a.numberOfGuests, b.numberOfGuests, isAsc);
+          return this.compare(a.number_of_guests, b.number_of_guests, isAsc);
         default:
           return 0;
       }
@@ -187,7 +187,7 @@ export class InviteeListComponent implements OnInit {
   async confirmDelete(invitee: Invitee): Promise<void> {
     if (
       confirm(
-        `Are you sure you want to delete ${invitee.firstName} ${invitee.lastName}?`
+        `Are you sure you want to delete ${invitee.first_name} ${invitee.last_name}?`
       )
     ) {
       try {
@@ -207,7 +207,7 @@ export class InviteeListComponent implements OnInit {
       // This would be implemented to send a reminder message
       // through the message service, but we'll mock it for now
       this.showNotification(
-        `RSVP reminder sent to ${invitee.firstName}`,
+        `RSVP reminder sent to ${invitee.first_name}`,
         'success'
       );
     } catch (error) {

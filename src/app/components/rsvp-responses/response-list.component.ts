@@ -101,16 +101,16 @@ export class ResponseListComponent implements OnInit {
     this.allInvitees = await this.supabaseService.getAllInvitees();
 
     this.confirmedInvitees = this.allInvitees.filter(
-      (i) => i.rsvpStatus === RSVPStatus.Confirmed
+      (i) => i.rsvp_status === RSVPStatus.Confirmed
     );
     this.pendingInvitees = this.allInvitees.filter(
-      (i) => i.rsvpStatus === RSVPStatus.Pending
+      (i) => i.rsvp_status === RSVPStatus.Pending
     );
     this.maybeInvitees = this.allInvitees.filter(
-      (i) => i.rsvpStatus === RSVPStatus.Maybe
+      (i) => i.rsvp_status === RSVPStatus.Maybe
     );
     this.declinedInvitees = this.allInvitees.filter(
-      (i) => i.rsvpStatus === RSVPStatus.Declined
+      (i) => i.rsvp_status === RSVPStatus.Declined
     );
 
     this.totalInvitees = this.allInvitees.length;
@@ -138,19 +138,19 @@ export class ResponseListComponent implements OnInit {
     const search = this.searchText.toLowerCase();
 
     this.filteredConfirmedInvitees = this.confirmedInvitees.filter((i) =>
-      `${i.firstName} ${i.lastName}`.toLowerCase().includes(search)
+      `${i.first_name} ${i.last_name}`.toLowerCase().includes(search)
     );
 
     this.filteredPendingInvitees = this.pendingInvitees.filter((i) =>
-      `${i.firstName} ${i.lastName}`.toLowerCase().includes(search)
+      `${i.first_name} ${i.last_name}`.toLowerCase().includes(search)
     );
 
     this.filteredMaybeInvitees = this.maybeInvitees.filter((i) =>
-      `${i.firstName} ${i.lastName}`.toLowerCase().includes(search)
+      `${i.first_name} ${i.last_name}`.toLowerCase().includes(search)
     );
 
     this.filteredDeclinedInvitees = this.declinedInvitees.filter((i) =>
-      `${i.firstName} ${i.lastName}`.toLowerCase().includes(search)
+      `${i.first_name} ${i.last_name}`.toLowerCase().includes(search)
     );
   }
 
@@ -174,7 +174,7 @@ export class ResponseListComponent implements OnInit {
         .subscribe({
           next: () => {
             this.showNotification(
-              `Reminder sent to ${invitee.firstName} ${invitee.lastName}`,
+              `Reminder sent to ${invitee.first_name} ${invitee.last_name}`,
               'success'
             );
           },
@@ -255,7 +255,7 @@ export class ResponseListComponent implements OnInit {
         .subscribe({
           next: () => {
             this.showNotification(
-              `Location details sent to ${invitee.firstName} ${invitee.lastName}`,
+              `Location details sent to ${invitee.first_name} ${invitee.last_name}`,
               'success'
             );
           },
@@ -294,7 +294,7 @@ export class ResponseListComponent implements OnInit {
         .subscribe({
           next: () => {
             this.showNotification(
-              `Follow-up sent to ${invitee.firstName} ${invitee.lastName}`,
+              `Follow-up sent to ${invitee.first_name} ${invitee.last_name}`,
               'success'
             );
           },
@@ -374,7 +374,7 @@ export class ResponseListComponent implements OnInit {
 
   getTotalGuests(): number {
     return this.allInvitees.reduce(
-      (total, invitee) => total + invitee.numberOfGuests,
+      (total, invitee) => total + invitee.number_of_guests,
       0
     );
   }
@@ -390,7 +390,7 @@ export class ResponseListComponent implements OnInit {
     this.sendingMessage = invitee.id as string; // Type assertion to fix the error
     setTimeout(() => {
       this.showNotification(
-        `Message sent to ${invitee.firstName} ${invitee.lastName}`,
+        `Message sent to ${invitee.first_name} ${invitee.last_name}`,
         'success'
       );
       this.sendingMessage = null;

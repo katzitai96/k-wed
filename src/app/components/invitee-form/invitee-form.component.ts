@@ -90,16 +90,16 @@ export class InviteeFormComponent implements OnInit {
       const invitee = await this.supabaseService.getInviteeById(id);
       if (invitee) {
         this.inviteeForm.patchValue({
-          firstName: invitee.firstName,
-          lastName: invitee.lastName,
-          phoneNumber: invitee.phoneNumber,
+          firstName: invitee.first_name,
+          lastName: invitee.last_name,
+          phoneNumber: invitee.phone_number,
           email: invitee.email || '',
-          numberOfGuests: invitee.numberOfGuests,
+          numberOfGuests: invitee.number_of_guests,
           relation: invitee.relation,
-          rsvpStatus: invitee.rsvpStatus,
-          dietaryRestrictions: invitee.dietaryRestrictions || '',
-          specialRequests: invitee.specialRequests || '',
-          additionalInfo: invitee.additionalInfo || '',
+          rsvpStatus: invitee.rsvp_status,
+          dietaryRestrictions: invitee.dietary_restrictions || '',
+          specialRequests: invitee.special_requests || '',
+          additionalInfo: invitee.additional_info || '',
         });
       } else {
         this.showNotification('Invitee not found', 'error');
@@ -121,17 +121,17 @@ export class InviteeFormComponent implements OnInit {
 
     try {
       const inviteeData: Invitee = {
-        firstName: this.inviteeForm.value.firstName,
-        lastName: this.inviteeForm.value.lastName,
-        phoneNumber: this.inviteeForm.value.phoneNumber,
+        first_name: this.inviteeForm.value.firstName,
+        last_name: this.inviteeForm.value.lastName,
+        phone_number: this.inviteeForm.value.phoneNumber,
         email: this.inviteeForm.value.email || undefined,
-        numberOfGuests: this.inviteeForm.value.numberOfGuests,
+        number_of_guests: this.inviteeForm.value.numberOfGuests,
         relation: this.inviteeForm.value.relation as RelationType,
-        rsvpStatus: this.inviteeForm.value.rsvpStatus as RSVPStatus,
-        dietaryRestrictions:
+        rsvp_status: this.inviteeForm.value.rsvpStatus as RSVPStatus,
+        dietary_restrictions:
           this.inviteeForm.value.dietaryRestrictions || undefined,
-        specialRequests: this.inviteeForm.value.specialRequests || undefined,
-        additionalInfo: this.inviteeForm.value.additionalInfo || undefined,
+        special_requests: this.inviteeForm.value.specialRequests || undefined,
+        additional_info: this.inviteeForm.value.additionalInfo || undefined,
       };
 
       if (this.isEditMode && this.inviteeId) {

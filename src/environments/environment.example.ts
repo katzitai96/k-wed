@@ -5,6 +5,7 @@ export const environment = {
   production: false,
   supabaseUrl: 'YOUR_SUPABASE_URL',
   supabaseKey: 'YOUR_SUPABASE_KEY',
+  supabaseServiceKey: 'YOUR_SUPABASE_SERVICE_ROLE_KEY', // Add this for admin operations
   twilioAccountSid: 'YOUR_TWILIO_ACCOUNT_SID',
   twilioAuthToken: 'YOUR_TWILIO_AUTH_TOKEN',
   twilioPhoneNumber: 'YOUR_TWILIO_PHONE_NUMBER',

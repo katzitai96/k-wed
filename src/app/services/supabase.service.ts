@@ -10,13 +10,40 @@ import { MessageHistory } from '../models/message-history.model';
 })
 export class SupabaseService {
   private supabase: SupabaseClient;
-
   constructor() {
     // Replace with your actual Supabase URL and key in the environment config
     this.supabase = createClient(
       environment.supabaseUrl,
-      environment.supabaseKey
+      environment.supabaseKey,
+      {
+        auth: {
+          persistSession: true,
+        },
+      }
     );
+  }
+
+  // Authentication methods
+  async signIn(email: string, password: string) {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      console.error('Error signing in:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  async signOut() {
+    const { error } = await this.supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
   }
 
   // Invitee methods
@@ -24,7 +51,7 @@ export class SupabaseService {
     const { data, error } = await this.supabase
       .from('invitees')
       .select('*')
-      .order('lastName', { ascending: true });
+      .order('last_name', { ascending: true });
 
     if (error) {
       console.error('Error fetching invitees:', error);
@@ -37,8 +64,8 @@ export class SupabaseService {
     const { data, error } = await this.supabase
       .from('invitees')
       .select('*')
-      .eq('rsvpStatus', status)
-      .order('lastName', { ascending: true });
+      .eq('rsvp_status', status)
+      .order('last_name', { ascending: true });
 
     if (error) {
       console.error(`Error fetching invitees with status ${status}:`, error);
@@ -64,7 +91,7 @@ export class SupabaseService {
   async createInvitee(invitee: Invitee): Promise<Invitee> {
     const { data, error } = await this.supabase
       .from('invitees')
-      .insert([{ ...invitee, createdAt: new Date(), updatedAt: new Date() }])
+      .insert([{ ...invitee, created_at: new Date(), updated_at: new Date() }])
       .select()
       .single();
 
@@ -78,7 +105,7 @@ export class SupabaseService {
   async updateInvitee(id: string, invitee: Partial<Invitee>): Promise<Invitee> {
     const { data, error } = await this.supabase
       .from('invitees')
-      .update({ ...invitee, updatedAt: new Date() })
+      .update({ ...invitee, updated_at: new Date() })
       .eq('id', id)
       .select()
       .single();
@@ -96,12 +123,12 @@ export class SupabaseService {
     additionalInfo?: string
   ): Promise<Invitee> {
     const updateData: Partial<Invitee> = {
-      rsvpStatus: status,
-      updatedAt: new Date(),
+      rsvp_status: status,
+      updated_at: new Date(),
     };
 
     if (additionalInfo) {
-      updateData.additionalInfo = additionalInfo;
+      updateData.additional_info = additionalInfo;
     }
 
     const { data, error } = await this.supabase
@@ -163,7 +190,7 @@ export class SupabaseService {
   ): Promise<MessageTemplate> {
     const { data, error } = await this.supabase
       .from('message_templates')
-      .insert([{ ...template, createdAt: new Date(), updatedAt: new Date() }])
+      .insert([{ ...template, created_at: new Date(), updated_at: new Date() }])
       .select()
       .single();
 
@@ -180,7 +207,7 @@ export class SupabaseService {
   ): Promise<MessageTemplate> {
     const { data, error } = await this.supabase
       .from('message_templates')
-      .update({ ...template, updatedAt: new Date() })
+      .update({ ...template, updated_at: new Date() })
       .eq('id', id)
       .select()
       .single();

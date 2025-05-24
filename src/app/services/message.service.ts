@@ -18,7 +18,7 @@ export class MessageService {
    */
   sendWhatsAppMessage(invitee: Invitee, message: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/send-message`, {
-      to: `whatsapp:${invitee.phoneNumber}`,
+      to: `whatsapp:${invitee.phone_number}`,
       body: message,
     });
   }
@@ -32,9 +32,9 @@ export class MessageService {
   ): Observable<any> {
     // Replace placeholders with actual values
     let messageBody = template.body
-      .replace('{{firstName}}', invitee.firstName)
-      .replace('{{lastName}}', invitee.lastName)
-      .replace('{{fullName}}', `${invitee.firstName} ${invitee.lastName}`);
+      .replace('{{firstName}}', invitee.first_name)
+      .replace('{{lastName}}', invitee.last_name)
+      .replace('{{fullName}}', `${invitee.first_name} ${invitee.last_name}`);
 
     return this.sendWhatsAppMessage(invitee, messageBody);
   }
@@ -48,12 +48,12 @@ export class MessageService {
   ): Observable<any> {
     const requests = invitees.map((invitee) => {
       const messageBody = template.body
-        .replace('{{firstName}}', invitee.firstName)
-        .replace('{{lastName}}', invitee.lastName)
-        .replace('{{fullName}}', `${invitee.firstName} ${invitee.lastName}`);
+        .replace('{{firstName}}', invitee.first_name)
+        .replace('{{lastName}}', invitee.last_name)
+        .replace('{{fullName}}', `${invitee.first_name} ${invitee.last_name}`);
 
       return {
-        to: `whatsapp:${invitee.phoneNumber}`,
+        to: `whatsapp:${invitee.phone_number}`,
         body: messageBody,
       };
     });
@@ -92,11 +92,11 @@ export class MessageService {
     scheduledDate: Date
   ): Observable<any> {
     return this.http.post(`${this.apiUrl}/schedule-message`, {
-      to: `whatsapp:${invitee.phoneNumber}`,
+      to: `whatsapp:${invitee.phone_number}`,
       body: template.body
-        .replace('{{firstName}}', invitee.firstName)
-        .replace('{{lastName}}', invitee.lastName)
-        .replace('{{fullName}}', `${invitee.firstName} ${invitee.lastName}`),
+        .replace('{{firstName}}', invitee.first_name)
+        .replace('{{lastName}}', invitee.last_name)
+        .replace('{{fullName}}', `${invitee.first_name} ${invitee.last_name}`),
       scheduledDate: scheduledDate.toISOString(),
     });
   }

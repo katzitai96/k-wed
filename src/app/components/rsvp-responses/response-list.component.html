@@ -83,40 +83,41 @@
             *ngFor="let invitee of invitees"
             class="invitee-card"
             [ngClass]="{
-              'status-confirmed': invitee.rsvpStatus === 'confirmed',
-              'status-declined': invitee.rsvpStatus === 'declined',
-              'status-pending': invitee.rsvpStatus === 'pending',
-              'status-maybe': invitee.rsvpStatus === 'maybe'
+              'status-confirmed': invitee.rsvp_status === 'confirmed',
+              'status-declined': invitee.rsvp_status === 'declined',
+              'status-pending': invitee.rsvp_status === 'pending',
+              'status-maybe': invitee.rsvp_status === 'maybe'
             }"
           >
             <mat-card-header>
               <mat-card-title
-                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+                >{{ invitee.first_name }}
+                {{ invitee.last_name }}</mat-card-title
               >
               <mat-card-subtitle>
                 {{ invitee.relation | titlecase }} •
-                {{ invitee.numberOfGuests }} Guest(s)
+                {{ invitee.number_of_guests }} Guest(s)
               </mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
               <p>
                 <strong>Status:</strong>
-                <span class="status-chip {{ invitee.rsvpStatus }}">{{
-                  invitee.rsvpStatus | titlecase
+                <span class="status-chip {{ invitee.rsvp_status }}">{{
+                  invitee.rsvp_status | titlecase
                 }}</span>
               </p>
-              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p><strong>Phone:</strong> {{ invitee.phone_number }}</p>
               <p *ngIf="invitee.email">
                 <strong>Email:</strong> {{ invitee.email }}
               </p>
-              <p *ngIf="invitee.dietaryRestrictions">
+              <p *ngIf="invitee.dietary_restrictions">
                 <strong>Dietary Restrictions:</strong>
-                {{ invitee.dietaryRestrictions }}
+                {{ invitee.dietary_restrictions }}
               </p>
-              <p *ngIf="invitee.additionalInfo">
+              <p *ngIf="invitee.additional_info">
                 <strong>Additional Info:</strong>
                 <span class="additional-info">{{
-                  invitee.additionalInfo
+                  invitee.additional_info
                 }}</span>
               </p>
             </mat-card-content>
@@ -159,26 +160,27 @@
           >
             <mat-card-header>
               <mat-card-title
-                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+                >{{ invitee.first_name }}
+                {{ invitee.last_name }}</mat-card-title
               >
               <mat-card-subtitle>
                 {{ invitee.relation | titlecase }} •
-                {{ invitee.numberOfGuests }} Guest(s)
+                {{ invitee.number_of_guests }} Guest(s)
               </mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
-              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p><strong>Phone:</strong> {{ invitee.phone_number }}</p>
               <p *ngIf="invitee.email">
                 <strong>Email:</strong> {{ invitee.email }}
               </p>
-              <p *ngIf="invitee.dietaryRestrictions">
+              <p *ngIf="invitee.dietary_restrictions">
                 <strong>Dietary Restrictions:</strong>
-                {{ invitee.dietaryRestrictions }}
+                {{ invitee.dietary_restrictions }}
               </p>
-              <p *ngIf="invitee.additionalInfo">
+              <p *ngIf="invitee.additional_info">
                 <strong>Additional Info:</strong>
                 <span class="additional-info">{{
-                  invitee.additionalInfo
+                  invitee.additional_info
                 }}</span>
               </p>
             </mat-card-content>
@@ -224,15 +226,16 @@
           >
             <mat-card-header>
               <mat-card-title
-                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+                >{{ invitee.first_name }}
+                {{ invitee.last_name }}</mat-card-title
               >
               <mat-card-subtitle>
                 {{ invitee.relation | titlecase }} •
-                {{ invitee.numberOfGuests }} Guest(s)
+                {{ invitee.number_of_guests }} Guest(s)
               </mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
-              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p><strong>Phone:</strong> {{ invitee.phone_number }}</p>
               <p *ngIf="invitee.email">
                 <strong>Email:</strong> {{ invitee.email }}
               </p>
@@ -281,21 +284,22 @@
           >
             <mat-card-header>
               <mat-card-title
-                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+                >{{ invitee.first_name }}
+                {{ invitee.last_name }}</mat-card-title
               >
               <mat-card-subtitle>
                 {{ invitee.relation | titlecase }}
               </mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
-              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p><strong>Phone:</strong> {{ invitee.phone_number }}</p>
               <p *ngIf="invitee.email">
                 <strong>Email:</strong> {{ invitee.email }}
               </p>
-              <p *ngIf="invitee.additionalInfo">
+              <p *ngIf="invitee.additional_info">
                 <strong>Additional Info:</strong>
                 <span class="additional-info">{{
-                  invitee.additionalInfo
+                  invitee.additional_info
                 }}</span>
               </p>
             </mat-card-content>
@@ -342,22 +346,23 @@
           >
             <mat-card-header>
               <mat-card-title
-                >{{ invitee.firstName }} {{ invitee.lastName }}</mat-card-title
+                >{{ invitee.first_name }}
+                {{ invitee.last_name }}</mat-card-title
               >
               <mat-card-subtitle>
                 {{ invitee.relation | titlecase }} •
-                {{ invitee.numberOfGuests }} Guest(s)
+                {{ invitee.number_of_guests }} Guest(s)
               </mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
-              <p><strong>Phone:</strong> {{ invitee.phoneNumber }}</p>
+              <p><strong>Phone:</strong> {{ invitee.phone_number }}</p>
               <p *ngIf="invitee.email">
                 <strong>Email:</strong> {{ invitee.email }}
               </p>
-              <p *ngIf="invitee.additionalInfo">
+              <p *ngIf="invitee.additional_info">
                 <strong>Additional Info:</strong>
                 <span class="additional-info">{{
-                  invitee.additionalInfo
+                  invitee.additional_info
                 }}</span>
               </p>
             </mat-card-content>

@@ -52,16 +52,16 @@ export class DashboardComponent implements OnInit {
 
     this.totalInvitees = invitees.length;
     this.confirmedCount = invitees.filter(
-      (i) => i.rsvpStatus === RSVPStatus.Confirmed
+      (i) => i.rsvp_status === RSVPStatus.Confirmed
     ).length;
     this.declinedCount = invitees.filter(
-      (i) => i.rsvpStatus === RSVPStatus.Declined
+      (i) => i.rsvp_status === RSVPStatus.Declined
     ).length;
     this.pendingCount = invitees.filter(
-      (i) => i.rsvpStatus === RSVPStatus.Pending
+      (i) => i.rsvp_status === RSVPStatus.Pending
     ).length;
     this.maybeCount = invitees.filter(
-      (i) => i.rsvpStatus === RSVPStatus.Maybe
+      (i) => i.rsvp_status === RSVPStatus.Maybe
     ).length;
 
     // Get invitees with pending RSVPs for the dashboard

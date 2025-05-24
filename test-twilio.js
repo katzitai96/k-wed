@@ -75,14 +75,25 @@ async function testTwilioWhatsApp() {
       );
     });
 
-    console.log(`📱 Sending test message to ${testPhone}...`);
+    console.log(
+      `📱 Sending test message from ${twilioNumber} to ${testPhone}...`
+    );
 
     // Send test message
-    await client.messages.create({
-      from: twilioNumber,
-      body: 'This is a test message from your Wedding RSVP app! 🎉 Reply with "Yes" to test the RSVP feature.',
-      to: `whatsapp:${testPhone}`,
-    });
+    // await client.messages.create({
+    //   from: twilioNumber,
+    //   body: 'This is a test message from your Wedding RSVP app! 🎉 Reply with "Yes" to test the RSVP feature.',
+    //   to: `whatsapp:${testPhone}`,
+    // });
+
+    client.messages
+      .create({
+        from: "whatsapp:+14155238886",
+        contentSid: "HXb5b62575e6e4ff6129ad7c8efe1f983e",
+        contentVariables: '{"1":"12/1","2":"3pm"}',
+        to: "whatsapp:+972543313267",
+      })
+      .then((message) => console.log(message.sid));
 
     console.log("✅ Test message sent successfully!");
     console.log("");

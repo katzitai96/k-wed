@@ -93,21 +93,21 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
         <td mat-cell *matCellDef="let invitee">
-          {{ invitee.firstName }} {{ invitee.lastName }}
+          {{ invitee.first_name }} {{ invitee.last_name }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="phone">
         <th mat-header-cell *matHeaderCellDef>Phone</th>
         <td mat-cell *matCellDef="let invitee">
-          {{ invitee.phoneNumber }}
+          {{ invitee.phone_number }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="guests">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Guests</th>
         <td mat-cell *matCellDef="let invitee">
-          {{ invitee.numberOfGuests }}
+          {{ invitee.number_of_guests }}
         </td>
       </ng-container>
 
@@ -157,7 +157,7 @@
           <button
             mat-icon-button
             (click)="sendReminder(invitee)"
-            [disabled]="invitee.rsvpStatus !== 'pending'"
+            [disabled]="invitee.rsvp_status !== 'pending'"
             matTooltip="Send Reminder"
           >
             <mat-icon>message</mat-icon>

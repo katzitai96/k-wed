@@ -46,19 +46,19 @@ export class ExportService {
     // Add data rows
     invitees.forEach((invitee) => {
       worksheet.addRow({
-        firstName: invitee.firstName,
-        lastName: invitee.lastName,
-        phoneNumber: invitee.phoneNumber,
+        firstName: invitee.first_name,
+        lastName: invitee.last_name,
+        phoneNumber: invitee.phone_number,
         email: invitee.email || '',
-        numberOfGuests: invitee.numberOfGuests,
+        numberOfGuests: invitee.number_of_guests,
         relation: invitee.relation,
-        rsvpStatus: invitee.rsvpStatus,
-        dietaryRestrictions: invitee.dietaryRestrictions || '',
-        specialRequests: invitee.specialRequests || '',
-        lastContacted: invitee.lastContacted
-          ? new Date(invitee.lastContacted).toLocaleString()
+        rsvpStatus: invitee.rsvp_status,
+        dietaryRestrictions: invitee.dietary_restrictions || '',
+        specialRequests: invitee.special_requests || '',
+        lastContacted: invitee.last_contacted
+          ? new Date(invitee.last_contacted).toLocaleString()
           : '',
-        additionalInfo: invitee.additionalInfo || '',
+        additionalInfo: invitee.additional_info || '',
       });
     });
 
@@ -91,11 +91,13 @@ export class ExportService {
 
     // Count by RSVP status
     const confirmed = invitees.filter(
-      (i) => i.rsvpStatus === 'confirmed'
+      (i) => i.rsvp_status === 'confirmed'
     ).length;
-    const declined = invitees.filter((i) => i.rsvpStatus === 'declined').length;
-    const pending = invitees.filter((i) => i.rsvpStatus === 'pending').length;
-    const maybe = invitees.filter((i) => i.rsvpStatus === 'maybe').length;
+    const declined = invitees.filter(
+      (i) => i.rsvp_status === 'declined'
+    ).length;
+    const pending = invitees.filter((i) => i.rsvp_status === 'pending').length;
+    const maybe = invitees.filter((i) => i.rsvp_status === 'maybe').length;
 
     worksheet.addRow(['Confirmed', confirmed]);
     worksheet.addRow(['Declined', declined]);
@@ -104,8 +106,8 @@ export class ExportService {
 
     // Calculate total expected guests
     const totalGuests = invitees
-      .filter((i) => i.rsvpStatus === 'confirmed' || i.rsvpStatus === 'maybe')
-      .reduce((sum, invitee) => sum + invitee.numberOfGuests, 0);
+      .filter((i) => i.rsvp_status === 'confirmed' || i.rsvp_status === 'maybe')
+      .reduce((sum, invitee) => sum + invitee.number_of_guests, 0);
 
     worksheet.addRow(['Total Expected Guests', totalGuests]);
 
