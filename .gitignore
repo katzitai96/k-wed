@@ -62,8 +62,6 @@ Thumbs.db
 
 # Specific files that might contain secrets
 src/environments/environment.ts
-src/environments/environment.prod.ts
-src/environments/environment.*.ts
 !src/environments/environment.example.ts
 
 # Supabase specific
