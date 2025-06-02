@@ -1,20 +1,20 @@
-const { getSupabaseClient, handleCors } = require('./_utils');
+const { getSupabaseClient, handleCors } = require("./_utils");
 
 module.exports = async (req, res) => {
   // Handle CORS
   if (handleCors(req, res)) return;
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
     const { to, body, scheduledDate, inviteeId, templateId } = req.body;
 
     if (!to || !body || !scheduledDate) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Missing required fields: to, body, scheduledDate' 
+      return res.status(400).json({
+        success: false,
+        error: "Missing required fields: to, body, scheduledDate",
       });
     }
 

@@ -10,9 +10,9 @@ const path = require("path");
 // This file is kept for local development only
 
 // Load environment variables - with path to the root directory
-require("dotenv").config({
-  path: path.resolve(__dirname, "../../../.env"),
-});
+// require("dotenv").config({
+//   path: path.resolve(__dirname, "../../../.env"),
+// });
 
 // Initialize Express app
 const app = express();
@@ -31,7 +31,10 @@ console.log(
 );
 console.log("- TWILIO_WHATSAPP_NUMBER:", process.env.TWILIO_WHATSAPP_NUMBER);
 console.log("- SUPABASE_URL:", process.env.SUPABASE_URL ? "Found" : "Missing");
-console.log("- SUPABASE_KEY:", process.env.SUPABASE_KEY ? "Found" : "Missing");
+console.log(
+  "- SUPABASE_KEY:",
+  process.env.SUPABASE_ANON_KEY ? "Found" : "Missing"
+);
 
 // Middleware
 app.use(bodyParser.json());

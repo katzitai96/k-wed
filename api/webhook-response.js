@@ -1,12 +1,12 @@
 const twilio = require("twilio");
-const { getTwilioClient, getSupabaseClient, handleCors } = require('./_utils');
+const { getTwilioClient, getSupabaseClient, handleCors } = require("./_utils");
 
 module.exports = async (req, res) => {
   // Handle CORS
   if (handleCors(req, res)) return;
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {

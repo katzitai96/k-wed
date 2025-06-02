@@ -1,26 +1,26 @@
-const { getTwilioClient, getSupabaseClient, handleCors } = require('./_utils');
+const { getTwilioClient, getSupabaseClient, handleCors } = require("./_utils");
 
 module.exports = async (req, res) => {
   // Handle CORS
   if (handleCors(req, res)) return;
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
     const { messages } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Missing or invalid messages array' 
+      return res.status(400).json({
+        success: false,
+        error: "Missing or invalid messages array",
       });
     }
 
     const twilioClient = getTwilioClient();
     const supabase = getSupabaseClient();
-    
+
     const results = [];
     const errors = [];
 
