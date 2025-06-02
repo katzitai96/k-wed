@@ -80,3 +80,4 @@ logs
 *.log
 
 *config.json
+.vercel

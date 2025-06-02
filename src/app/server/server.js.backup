@@ -5,10 +5,6 @@ const twilio = require("twilio");
 const { createClient } = require("@supabase/supabase-js");
 const path = require("path");
 
-// NOTE: This server has been migrated to Vercel serverless functions
-// For Vercel deployment, see the files in ./api/ directory
-// This file is kept for local development only
-
 // Load environment variables - with path to the root directory
 require("dotenv").config({
   path: path.resolve(__dirname, "../../../.env.local"),

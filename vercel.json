@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/wedding-rsvp"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/health",
+      "dest": "/api/health.js"
+    },
+    {
+      "src": "/api/send-message",
+      "dest": "/api/send-message.js"
+    },
+    {
+      "src": "/api/send-bulk-messages",
+      "dest": "/api/send-bulk-messages.js"
+    },
+    {
+      "src": "/api/schedule-message",
+      "dest": "/api/schedule-message.js"
+    },
+    {
+      "src": "/api/webhook-response",
+      "dest": "/api/webhook-response.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/wedding-rsvp/index.html"
+    }
+  ]
+}
