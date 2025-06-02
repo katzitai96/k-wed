@@ -8,6 +8,7 @@
     "build": "ng build",
     "build:prod": "ng build --configuration=production",
     "vercel-build": "ng build --configuration=production",
+    "postbuild": "echo Build completed in dist/wedding-rsvp/browser",
     "deploy": "node deploy-vercel.js",
     "test:setup": "node test-vercel-setup.js",
     "test:deployed": "node test-deployed-api.js",
@@ -17,7 +18,8 @@
     "test:twilio": "node test-twilio.js",
     "setup:db": "node setup-db.js"
   },
-  "private": true,  "dependencies": {
+  "private": true,
+  "dependencies": {
     "@angular/animations": "^19.2.11",
     "@angular/cdk": "^19.2.16",
     "@angular/common": "^19.2.0",

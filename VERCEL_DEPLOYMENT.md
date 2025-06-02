@@ -7,7 +7,7 @@ This document outlines how to deploy the Wedding RSVP application to Vercel as s
 The Express.js server has been converted to individual serverless functions:
 
 - `api/send-message.js` - Send single WhatsApp message
-- `api/send-bulk-messages.js` - Send bulk WhatsApp messages  
+- `api/send-bulk-messages.js` - Send bulk WhatsApp messages
 - `api/schedule-message.js` - Schedule messages for later
 - `api/webhook-response.js` - Handle Twilio webhook responses
 - `api/health.js` - Health check endpoint
@@ -35,9 +35,10 @@ c:\develop\k-wed\
 ✅ `vercel.json` configuration is correct  
 ✅ `package.json` has `vercel-build` script  
 ✅ Environment variables are documented  
-✅ Production environment file is configured  
+✅ Production environment file is configured
 
 Run the setup test:
+
 ```bash
 node test-vercel-setup.js
 ```
@@ -56,22 +57,26 @@ Set these environment variables in your Vercel dashboard:
 ## Deployment Steps
 
 1. **Connect to Vercel:**
+
    ```bash
    npm install -g vercel
    vercel login
    ```
 
 2. **Initial deployment:**
+
    ```bash
    vercel
    ```
 
 3. **Set environment variables:**
+
    - Go to your Vercel dashboard
    - Navigate to your project settings
    - Add all environment variables listed above
 
 4. **Update Twilio webhook URL:**
+
    - In your Twilio console, update the webhook URL for your WhatsApp sandbox/number
    - Set it to: `https://your-app-name.vercel.app/api/webhook-response`
 
@@ -113,11 +118,13 @@ npm run start:dev
 ## Troubleshooting
 
 1. **Webhook not receiving messages:**
+
    - Check that the webhook URL is correctly set in Twilio
    - Verify environment variables are set correctly
    - Check Vercel function logs for errors
 
 2. **Messages not sending:**
+
    - Verify Twilio credentials are correct
    - Check that the WhatsApp number is properly formatted
    - Ensure Supabase connection is working

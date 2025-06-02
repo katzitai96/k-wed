@@ -9,34 +9,25 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist/wedding-rsvp"
+        "distDir": "dist/wedding-rsvp/browser"
       }
     }
   ],
   "routes": [
     {
-      "src": "/api/health",
-      "dest": "/api/health.js"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
     {
-      "src": "/api/send-message",
-      "dest": "/api/send-message.js"
-    },
-    {
-      "src": "/api/send-bulk-messages",
-      "dest": "/api/send-bulk-messages.js"
-    },
-    {
-      "src": "/api/schedule-message",
-      "dest": "/api/schedule-message.js"
-    },
-    {
-      "src": "/api/webhook-response",
-      "dest": "/api/webhook-response.js"
+      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))",
+      "headers": {
+        "cache-control": "public, immutable, max-age=31536000"
+      },
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/wedding-rsvp/index.html"
+      "dest": "/index.html"
     }
   ]
 }
