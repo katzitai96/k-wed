@@ -61,8 +61,8 @@ Thumbs.db
 *auth*
 
 # Specific files that might contain secrets
-src/environments/environment.ts
-!src/environments/environment.example.ts
+# src/environments/environment.ts
+# !src/environments/environment.example.ts
 
 # Supabase specific
 supabase/.temp
