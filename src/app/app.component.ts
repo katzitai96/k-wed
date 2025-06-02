@@ -6,6 +6,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,9 @@ import { CommonModule } from '@angular/common';
     MatListModule,
     MatIconModule,
     MatButtonModule,
+  ],
+  providers: [
+    HttpClient, // Provide HttpClient for making API requests
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

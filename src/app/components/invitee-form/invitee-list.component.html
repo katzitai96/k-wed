@@ -12,7 +12,7 @@
       <button
         mat-raised-button
         color="accent"
-        (click)="exportInviteeList()"
+        (click)="exportInvitees()"
         [disabled]="loading || !invitees.length"
       >
         <mat-icon>download</mat-icon> Export to Excel
@@ -124,13 +124,13 @@
           <span
             class="status-chip"
             [ngClass]="{
-              confirmed: invitee.rsvpStatus === 'confirmed',
-              declined: invitee.rsvpStatus === 'declined',
-              pending: invitee.rsvpStatus === 'pending',
-              maybe: invitee.rsvpStatus === 'maybe'
+              confirmed: invitee.rsvp_status === 'confirmed',
+              declined: invitee.rsvp_status === 'declined',
+              pending: invitee.rsvp_status === 'pending',
+              maybe: invitee.rsvp_status === 'maybe'
             }"
           >
-            {{ invitee.rsvpStatus | titlecase }}
+            {{ invitee.rsvp_status | titlecase }}
           </span>
         </td>
       </ng-container>
@@ -156,7 +156,7 @@
           </button>
           <button
             mat-icon-button
-            (click)="sendReminder(invitee)"
+            (click)="sendMessage(invitee)"
             [disabled]="invitee.rsvp_status !== 'pending'"
             matTooltip="Send Reminder"
           >

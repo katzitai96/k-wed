@@ -391,41 +391,37 @@ export class ResponseListComponent implements OnInit {
   }
   async sendMessage(invitee: Invitee): Promise<void> {
     this.sendingMessage = invitee.id as string;
-    let template = this.templates.find((t) => t.type === 'custom'); // Or some other default
-    if (!template) {
-      // Create a generic message if no template is found
-      const genericMessage = `Hello ${invitee.first_name}, this is a message regarding the event.`;
+    const reminderTemplate = this.templates.find((t) => t.type === 'reminder');
+
+    if (!reminderTemplate) {
+      this.showNotification(
+        'No reminder template found. Please create one first.',
+        'error'
+      );
+      this.sendingMessage = null;
+      return;
+    }
+
+    try {
       this.messageService
-        .sendWhatsAppMessage(invitee, genericMessage)
+        .sendTemplatedMessage(invitee, reminderTemplate)
         .subscribe({
           next: () => {
             this.showNotification(
-              `Message sent to ${invitee.first_name} ${invitee.last_name}`,
+              `Reminder sent to ${invitee.first_name} ${invitee.last_name}`,
               'success'
             );
             this.sendingMessage = null;
           },
           error: (error) => {
-            console.error('Error sending message:', error);
-            this.showNotification('Failed to send message', 'error');
+            console.error('Error sending reminder:', error);
+            this.showNotification('Failed to send reminder', 'error');
             this.sendingMessage = null;
           },
         });
-      return;
-    }
-
-    try {
-      await this.messageService
-        .sendTemplatedMessage(invitee, template)
-        .toPromise();
-      this.showNotification(
-        `Message sent to ${invitee.first_name} ${invitee.last_name}`,
-        'success'
-      );
     } catch (error) {
-      console.error('Error sending templated message:', error);
-      this.showNotification('Failed to send templated message', 'error');
-    } finally {
+      console.error('Error sending reminder:', error);
+      this.showNotification('Failed to send reminder', 'error');
       this.sendingMessage = null;
     }
   }

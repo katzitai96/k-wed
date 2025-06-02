@@ -18,6 +18,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { SupabaseService } from '../../services/supabase.service';
 import { ExportService } from '../../services/export.service';
 import { Invitee, RSVPStatus, RelationType } from '../../models/invitee.model';
+import { MessageTemplate } from '../../models/message-template.model'; // Added import
+import { MessageService } from '../../services/message.service'; // Added import
 
 @Component({
   selector: 'app-invitee-list',
@@ -47,6 +49,8 @@ export class InviteeListComponent implements OnInit {
   filteredInvitees: Invitee[] = [];
   paginatedInvitees: Invitee[] = [];
   loading = true;
+  templates: MessageTemplate[] = []; // Added property
+  sendingMessage: string | null = null; // Added property
 
   // Computed properties for status counts
   get confirmedCount(): number {
@@ -88,13 +92,14 @@ export class InviteeListComponent implements OnInit {
     private supabaseService: SupabaseService,
     private exportService: ExportService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private messageService: MessageService // Added injection
   ) {}
 
   async ngOnInit(): Promise<void> {
     try {
       this.loading = true;
-      await this.loadInvitees();
+      await Promise.all([this.loadInvitees(), this.loadTemplates()]); // Added loadTemplates
     } catch (error) {
       console.error('Error loading invitees:', error);
       this.showNotification(
@@ -109,6 +114,11 @@ export class InviteeListComponent implements OnInit {
   async loadInvitees(): Promise<void> {
     this.invitees = await this.supabaseService.getAllInvitees();
     this.applyFilter();
+  }
+
+  async loadTemplates(): Promise<void> {
+    // Added method
+    this.templates = await this.supabaseService.getAllMessageTemplates();
   }
 
   applyFilter(): void {
@@ -202,21 +212,58 @@ export class InviteeListComponent implements OnInit {
     }
   }
 
-  async sendReminder(invitee: Invitee): Promise<void> {
-    try {
-      // This would be implemented to send a reminder message
-      // through the message service, but we'll mock it for now
+  async sendMessage(invitee: Invitee): Promise<void> {
+    // Added method
+    this.sendingMessage = invitee.id as string;
+    const reminderTemplate = this.templates.find((t) => t.type === 'reminder');
+
+    if (!reminderTemplate) {
       this.showNotification(
-        `RSVP reminder sent to ${invitee.first_name}`,
-        'success'
+        'No reminder template found. Please create one first.',
+        'error'
       );
+      this.sendingMessage = null;
+      return;
+    }
+
+    try {
+      this.messageService
+        .sendTemplatedMessage(invitee, reminderTemplate)
+        .subscribe({
+          next: () => {
+            this.showNotification(
+              `Reminder sent to ${invitee.first_name} ${invitee.last_name}`,
+              'success'
+            );
+            this.sendingMessage = null;
+          },
+          error: (error) => {
+            console.error('Error sending reminder:', error);
+            this.showNotification('Failed to send reminder', 'error');
+            this.sendingMessage = null;
+          },
+        });
     } catch (error) {
       console.error('Error sending reminder:', error);
       this.showNotification('Failed to send reminder', 'error');
+      this.sendingMessage = null;
     }
   }
 
-  exportInviteeList(): void {
+  showNotification(message: string, type: 'success' | 'error' | 'info'): void {
+    // Added method
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass:
+        type === 'error'
+          ? ['error-snackbar']
+          : type === 'success'
+          ? ['success-snackbar']
+          : ['info-snackbar'],
+    });
+  }
+
+  exportInvitees(): void {
     try {
       this.exportService.exportToExcel(this.invitees);
       this.showNotification(
@@ -227,17 +274,5 @@ export class InviteeListComponent implements OnInit {
       console.error('Error exporting to Excel:', error);
       this.showNotification('Failed to export data', 'error');
     }
-  }
-
-  showNotification(message: string, type: 'success' | 'error' | 'info'): void {
-    this.snackBar.open(message, 'Close', {
-      duration: 5000,
-      panelClass:
-        type === 'error'
-          ? ['error-snackbar']
-          : type === 'success'
-          ? ['success-snackbar']
-          : ['info-snackbar'],
-    });
   }
 }
