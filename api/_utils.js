@@ -8,7 +8,7 @@ const getTwilioClient = () => {
 
 // Initialize Supabase client
 const getSupabaseClient = () => {
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 };
 
 // CORS headers for responses

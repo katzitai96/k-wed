@@ -10,9 +10,9 @@ const path = require("path");
 // This file is kept for local development only
 
 // Load environment variables - with path to the root directory
-// require("dotenv").config({
-//   path: path.resolve(__dirname, "../../../.env"),
-// });
+require("dotenv").config({
+  path: path.resolve(__dirname, "../../../.env"),
+});
 
 // Initialize Express app
 const app = express();
