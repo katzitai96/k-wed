@@ -76,11 +76,11 @@
     mat-stretch-tabs="false"
     mat-align-tabs="start"
   >
-    <mat-tab label="All ({{ invitees.length }})">
+    <mat-tab label="All ({{ allInvitees.length }})">
       <ng-template matTabContent>
         <div class="invitees-list">
           <mat-card
-            *ngFor="let invitee of invitees"
+            *ngFor="let invitee of allInvitees"
             class="invitee-card"
             [ngClass]="{
               'status-confirmed': invitee.rsvp_status === 'confirmed',
@@ -145,7 +145,7 @@
             </div>
           </mat-card>
 
-          <div class="no-results" *ngIf="invitees.length === 0">
+          <div class="no-results" *ngIf="allInvitees.length === 0">
             <p>No invitees found.</p>
           </div>
         </div>

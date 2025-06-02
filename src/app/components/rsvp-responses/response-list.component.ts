@@ -52,7 +52,6 @@ export class ResponseListComponent implements OnInit {
   declinedInvitees: Invitee[] = [];
 
   // Additional properties for template view
-  invitees: Invitee[] = [];
   messageTemplates: MessageTemplate[] = [];
   selectedTemplate: MessageTemplate | null = null;
   selectedGroup: string = 'all';
@@ -119,11 +118,16 @@ export class ResponseListComponent implements OnInit {
     this.maybeCount = this.maybeInvitees.length;
     this.declinedCount = this.declinedInvitees.length;
 
+    // Populate messageTemplates from templates
+    this.messageTemplates = this.templates;
+
     this.filterInvitees();
   }
 
   async loadTemplates(): Promise<void> {
     this.templates = await this.supabaseService.getAllMessageTemplates();
+    // Populate messageTemplates after loading templates
+    this.messageTemplates = this.templates;
   }
 
   filterInvitees(): void {
@@ -385,20 +389,52 @@ export class ResponseListComponent implements OnInit {
       this.confirmedCount + this.declinedCount + this.maybeCount;
     return Math.round((responded / this.totalInvitees) * 100);
   }
-  sendMessage(invitee: Invitee): void {
-    // Implementation for sending a message to a specific invitee
-    this.sendingMessage = invitee.id as string; // Type assertion to fix the error
-    setTimeout(() => {
+  async sendMessage(invitee: Invitee): Promise<void> {
+    this.sendingMessage = invitee.id as string;
+    let template = this.templates.find((t) => t.type === 'custom'); // Or some other default
+    if (!template) {
+      // Create a generic message if no template is found
+      const genericMessage = `Hello ${invitee.first_name}, this is a message regarding the event.`;
+      this.messageService
+        .sendWhatsAppMessage(invitee, genericMessage)
+        .subscribe({
+          next: () => {
+            this.showNotification(
+              `Message sent to ${invitee.first_name} ${invitee.last_name}`,
+              'success'
+            );
+            this.sendingMessage = null;
+          },
+          error: (error) => {
+            console.error('Error sending message:', error);
+            this.showNotification('Failed to send message', 'error');
+            this.sendingMessage = null;
+          },
+        });
+      return;
+    }
+
+    try {
+      await this.messageService
+        .sendTemplatedMessage(invitee, template)
+        .toPromise();
       this.showNotification(
         `Message sent to ${invitee.first_name} ${invitee.last_name}`,
         'success'
       );
+    } catch (error) {
+      console.error('Error sending templated message:', error);
+      this.showNotification('Failed to send templated message', 'error');
+    } finally {
       this.sendingMessage = null;
-    }, 1500);
+    }
   }
 
-  sendBulkMessages(): void {
-    if (!this.selectedTemplate) return;
+  async sendBulkMessages(): Promise<void> {
+    if (!this.selectedTemplate) {
+      this.showNotification('Please select a message template.', 'error');
+      return;
+    }
 
     let targetInvitees: Invitee[] = [];
     switch (this.selectedGroup) {
@@ -418,23 +454,34 @@ export class ResponseListComponent implements OnInit {
         targetInvitees = this.allInvitees;
     }
 
+    if (targetInvitees.length === 0) {
+      this.showNotification(
+        'No invitees found for the selected group.',
+        'info'
+      );
+      return;
+    }
+
     this.bulkSending = true;
     this.bulkTotal = targetInvitees.length;
     this.bulkProgress = 0;
 
-    // Simulate sending messages
-    let sent = 0;
-    const interval = setInterval(() => {
-      if (sent >= targetInvitees.length) {
-        clearInterval(interval);
-        this.bulkSending = false;
-        this.showNotification(`Messages sent to ${sent} invitees`, 'success');
-        return;
-      }
-
-      sent++;
-      this.bulkProgress = sent;
-    }, 300);
+    try {
+      await this.messageService
+        .sendBulkMessages(targetInvitees, this.selectedTemplate)
+        .toPromise();
+      this.showNotification(
+        `Bulk messages sent to ${targetInvitees.length} invitees.`,
+        'success'
+      );
+    } catch (error) {
+      console.error('Error sending bulk messages:', error);
+      this.showNotification('Failed to send bulk messages.', 'error');
+    } finally {
+      this.bulkSending = false;
+      this.bulkProgress = 0;
+      this.bulkTotal = 0;
+    }
   }
 
   // For the "Remind Later" functionality  // This is intentionally left blank since the original method exists
