@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment';
+// import { environment } from '../../environments/environment';
 import { Invitee, RSVPStatus } from '../models/invitee.model';
 import { MessageTemplate } from '../models/message-template.model';
 import { MessageHistory } from '../models/message-history.model';
@@ -13,8 +13,10 @@ export class SupabaseService {
   constructor() {
     // Replace with your actual Supabase URL and key in the environment config
     this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey,
+      process.env['SUPABASE_URL'] || '',
+      process.env['SUPABASE_ANON_KEY'] || '',
+      // environment.supabaseUrl,
+      // environment.supabaseKey,
       {
         auth: {
           persistSession: true,
