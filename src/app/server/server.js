@@ -11,7 +11,7 @@ const path = require("path");
 
 // Load environment variables - with path to the root directory
 require("dotenv").config({
-  path: path.resolve(__dirname, "../../../.env.local"),
+  path: path.resolve(__dirname, "../../../.env"),
 });
 
 // Initialize Express app
@@ -47,7 +47,7 @@ const twilioClient = twilio(
 // Initialize Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
+  process.env.SUPABASE_ANON_KEY
 );
 
 // Serve static files from Angular app

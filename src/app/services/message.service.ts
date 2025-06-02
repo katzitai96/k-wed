@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-// import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment';
 import { Invitee } from '../models/invitee.model';
 import { MessageTemplate } from '../models/message-template.model';
 
@@ -9,8 +9,8 @@ import { MessageTemplate } from '../models/message-template.model';
   providedIn: 'root',
 })
 export class MessageService {
-  private apiUrl = '/api'; // Default API URL, can be overridden by environment config
-  // private apiUrl = environment.apiUrl; // Use API URL from environment
+  // private apiUrl = '/api'; // Default API URL, can be overridden by environment config
+  private apiUrl = environment.apiUrl; // Use API URL from environment
 
   constructor(private http: HttpClient) {}
 
