@@ -1,9 +1,30 @@
-const twilio = require("twilio");
-const { getTwilioClient, getSupabaseClient, handleCors } = require("./_utils");
+const { getSupabaseClient, handleCors } = require("./_utils");
+const {
+  parseWebhookPayload,
+  verifyWebhookSignature,
+  getWhatsAppConfig,
+} = require("./_whatsapp-utils");
 
 module.exports = async (req, res) => {
   // Handle CORS
   if (handleCors(req, res)) return;
+
+  // Handle webhook verification (GET request)
+  if (req.method === "GET") {
+    const mode = req.query["hub.mode"];
+    const token = req.query["hub.verify_token"];
+    const challenge = req.query["hub.challenge"];
+
+    const config = getWhatsAppConfig();
+
+    if (mode === "subscribe" && token === config.webhookVerifyToken) {
+      console.log("Webhook verified successfully");
+      return res.status(200).send(challenge);
+    } else {
+      console.error("Webhook verification failed");
+      return res.status(403).send("Forbidden");
+    }
+  }
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -11,7 +32,7 @@ module.exports = async (req, res) => {
 
   try {
     // Log the incoming request for debugging
-    console.log("Webhook request received:", {
+    console.log("WhatsApp webhook request received:", {
       headers: req.headers,
       body: req.body,
     });
@@ -22,34 +43,16 @@ module.exports = async (req, res) => {
       return res.status(400).send("Bad Request: Empty body");
     }
 
-    const twilioSignature = req.headers["x-twilio-signature"];
+    // Parse WhatsApp webhook payload
+    const messageData = parseWebhookPayload(req.body);
 
-    // Validate Twilio request
-    const requestIsValid = twilio.validateRequest(
-      process.env.TWILIO_AUTH_TOKEN,
-      twilioSignature,
-      process.env.WEBHOOK_URL, // Full URL to this endpoint
-      req.body
-    );
-
-    if (!requestIsValid && process.env.NODE_ENV === "production") {
-      return res.status(403).send("Forbidden");
+    if (!messageData) {
+      console.log("No message data found in webhook, might be a status update");
+      return res.status(200).send("OK");
     }
 
-    const from = req.body.From || "unknown";
-    const body = req.body.Body ? req.body.Body.trim() : "";
-    console.log(`Received message from ${from}: ${body}`);
-
-    // Look up invitee by phone number
-    let formattedPhone = from;
-
-    // Remove WhatsApp prefix if present
-    if (typeof from === "string") {
-      formattedPhone = from.replace("whatsapp:", "");
-    } else {
-      console.error("Invalid 'From' field in webhook:", from);
-      formattedPhone = "";
-    }
+    const { from, text: messageText, messageId } = messageData;
+    console.log(`Received WhatsApp message from ${from}: ${messageText}`);
 
     // Only proceed with database lookup if we have a valid phone number
     if (!formattedPhone) {
@@ -75,22 +78,22 @@ module.exports = async (req, res) => {
       // Process RSVP response
       let rsvpStatus = "pending";
 
-      const lowercaseBody = body.toLowerCase();
+      const lowercaseText = messageText.toLowerCase();
       if (
-        lowercaseBody.includes("yes") ||
-        lowercaseBody.includes("attending") ||
-        lowercaseBody.includes("will attend")
+        lowercaseText.includes("yes") ||
+        lowercaseText.includes("attending") ||
+        lowercaseText.includes("will attend")
       ) {
         rsvpStatus = "confirmed";
       } else if (
-        lowercaseBody.includes("no") ||
-        lowercaseBody.includes("not attending") ||
-        lowercaseBody.includes("cannot attend")
+        lowercaseText.includes("no") ||
+        lowercaseText.includes("not attending") ||
+        lowercaseText.includes("cannot attend")
       ) {
         rsvpStatus = "declined";
       } else if (
-        lowercaseBody.includes("maybe") ||
-        lowercaseBody.includes("possibly")
+        lowercaseText.includes("maybe") ||
+        lowercaseText.includes("possibly")
       ) {
         rsvpStatus = "maybe";
       }
@@ -104,8 +107,8 @@ module.exports = async (req, res) => {
             additional_info: invitee.additional_info
               ? `${
                   invitee.additional_info
-                }\n${new Date().toISOString()}: ${body}`
-              : `${new Date().toISOString()}: ${body}`,
+                }\n${new Date().toISOString()}: ${messageText}`
+              : `${new Date().toISOString()}: ${messageText}`,
             updated_at: new Date(),
           })
           .eq("id", invitee.id);
@@ -121,12 +124,13 @@ module.exports = async (req, res) => {
         .insert([
           {
             invitee_id: invitee.id,
-            message_body: body,
+            message_body: messageText,
             sent_at: new Date(),
             status: "delivered",
             response_received: true,
-            response_text: body,
+            response_text: messageText,
             response_received_at: new Date(),
+            whatsapp_message_id: messageId,
           },
         ]);
 
@@ -135,19 +139,11 @@ module.exports = async (req, res) => {
       }
     }
 
-    try {
-      // Send acknowledgment response
-      const twiml = new twilio.twiml.MessagingResponse();
-      twiml.message("Thanks for your response! We've recorded your RSVP. 💕");
-
-      res.type("text/xml");
-      res.send(twiml.toString());
-    } catch (responseError) {
-      console.error("Error sending acknowledgment response:", responseError);
-      res.status(500).send("Error processing webhook");
-    }
+    // For WhatsApp Cloud API, we just need to return 200 OK
+    // No need to send a TwiML response like with Twilio
+    res.status(200).send("OK");
   } catch (error) {
-    console.error("Error handling webhook response:", error);
+    console.error("Error handling WhatsApp webhook:", error);
 
     // Log detailed error information
     console.error({

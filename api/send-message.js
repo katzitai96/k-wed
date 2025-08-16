@@ -1,4 +1,5 @@
-const { getTwilioClient, getSupabaseClient, handleCors } = require("./_utils");
+const { getSupabaseClient, handleCors } = require("./_utils");
+const { sendTextMessage } = require("./_whatsapp-utils");
 
 module.exports = async (req, res) => {
   // Handle CORS
@@ -18,14 +19,10 @@ module.exports = async (req, res) => {
       });
     }
 
-    const twilioClient = getTwilioClient();
     const supabase = getSupabaseClient();
 
-    const message = await twilioClient.messages.create({
-      from: process.env.TWILIO_WHATSAPP_NUMBER,
-      to,
-      body,
-    });
+    // Send message via WhatsApp Cloud API
+    const whatsappResponse = await sendTextMessage(to, body);
 
     // Record message in database
     const { data: messageRecord, error: dbError } = await supabase
@@ -36,7 +33,8 @@ module.exports = async (req, res) => {
           template_id: templateId || null,
           message_body: body,
           sent_at: new Date(),
-          status: "pending",
+          status: "sent",
+          whatsapp_message_id: whatsappResponse.messages?.[0]?.id || null,
         },
       ])
       .select();
@@ -47,11 +45,22 @@ module.exports = async (req, res) => {
 
     res.json({
       success: true,
-      messageSid: message.sid,
+      whatsappMessageId: whatsappResponse.messages?.[0]?.id,
       messageHistoryId: messageRecord?.[0]?.id,
+      whatsappResponse: whatsappResponse,
     });
   } catch (error) {
-    console.error("Error sending message:", error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error("Error sending WhatsApp message:", error);
+
+    // Return more detailed error information
+    const errorMessage = error.response?.data?.error?.message || error.message;
+    const errorCode = error.response?.data?.error?.code || "UNKNOWN_ERROR";
+
+    res.status(500).json({
+      success: false,
+      error: errorMessage,
+      errorCode: errorCode,
+      details: error.response?.data || null,
+    });
   }
 };

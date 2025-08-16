@@ -1,10 +1,4 @@
-const twilio = require("twilio");
 const { createClient } = require("@supabase/supabase-js");
-
-// Initialize Twilio client
-const getTwilioClient = () => {
-  return twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-};
 
 // Initialize Supabase client
 const getSupabaseClient = () => {
@@ -34,7 +28,6 @@ const handleCors = (req, res) => {
 };
 
 module.exports = {
-  getTwilioClient,
   getSupabaseClient,
   handleCors,
   corsHeaders,

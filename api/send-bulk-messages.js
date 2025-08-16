@@ -1,4 +1,5 @@
-const { getTwilioClient, getSupabaseClient, handleCors } = require("./_utils");
+const { getSupabaseClient, handleCors } = require("./_utils");
+const { sendTextMessage } = require("./_whatsapp-utils");
 
 module.exports = async (req, res) => {
   // Handle CORS
@@ -18,7 +19,6 @@ module.exports = async (req, res) => {
       });
     }
 
-    const twilioClient = getTwilioClient();
     const supabase = getSupabaseClient();
 
     const results = [];
@@ -27,11 +27,11 @@ module.exports = async (req, res) => {
     // Send messages one by one to avoid rate limiting
     for (const msgData of messages) {
       try {
-        const message = await twilioClient.messages.create({
-          from: process.env.TWILIO_WHATSAPP_NUMBER,
-          to: msgData.to,
-          body: msgData.body,
-        });
+        // Send message via WhatsApp Cloud API
+        const whatsappResponse = await sendTextMessage(
+          msgData.to,
+          msgData.body
+        );
 
         // Record message in database
         const { data: messageRecord, error: dbError } = await supabase
@@ -42,7 +42,8 @@ module.exports = async (req, res) => {
               template_id: msgData.templateId || null,
               message_body: msgData.body,
               sent_at: new Date(),
-              status: "pending",
+              status: "sent",
+              whatsapp_message_id: whatsappResponse.messages?.[0]?.id || null,
             },
           ])
           .select();
@@ -53,15 +54,15 @@ module.exports = async (req, res) => {
 
         results.push({
           to: msgData.to,
-          messageSid: message.sid,
+          whatsappMessageId: whatsappResponse.messages?.[0]?.id,
           messageHistoryId: messageRecord?.[0]?.id,
         });
       } catch (error) {
         errors.push({ to: msgData.to, error: error.message });
       }
 
-      // Small delay to avoid rate limiting
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      // Small delay to avoid rate limiting (WhatsApp Cloud API has rate limits)
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Increased delay for safety
     }
 
     res.json({ success: true, results, errors });
