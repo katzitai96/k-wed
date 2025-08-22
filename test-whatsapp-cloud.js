@@ -3,7 +3,11 @@
 // Test script for WhatsApp Cloud API
 // Usage: node test-whatsapp-cloud.js
 
-const { sendTextMessage, getWhatsAppConfig } = require("./api/_whatsapp-utils");
+const {
+  sendTextMessage,
+  getWhatsAppConfig,
+  sendTemplateMessage,
+} = require("./api/_whatsapp-utils");
 
 async function testWhatsAppAPI() {
   console.log("🧪 Testing WhatsApp Cloud API...");
@@ -14,13 +18,18 @@ async function testWhatsAppAPI() {
   console.log("Configuration check:");
   console.log(
     "- Phone Number ID:",
-    config.phoneNumberId ? "✅ Set" : "❌ Missing"
+    config.phoneNumberId ? "✅ Set: " + config.phoneNumberId : "❌ Missing"
   );
   console.log("- Access Token:", config.accessToken ? "✅ Set" : "❌ Missing");
-  console.log("- WABA ID:", config.wabaId ? "✅ Set" : "❌ Missing");
+  console.log(
+    "- WABA ID:",
+    config.wabaId ? "✅ Set: " + config.wabaId : "❌ Missing"
+  );
   console.log(
     "- Webhook Verify Token:",
-    config.webhookVerifyToken ? "✅ Set" : "❌ Missing"
+    config.webhookVerifyToken
+      ? "✅ Set: " + config.webhookVerifyToken
+      : "❌ Missing"
   );
 
   if (!config.phoneNumberId || !config.accessToken) {
@@ -49,7 +58,8 @@ async function testWhatsAppAPI() {
 
   try {
     console.log(`\n📱 Sending test message to ${testPhoneNumber}...`);
-    const response = await sendTextMessage(testPhoneNumber, testMessage);
+    // const response = await sendTextMessage(testPhoneNumber, testMessage);
+    const response = await sendTemplateMessage(testPhoneNumber, "hello_world");
 
     console.log("✅ Message sent successfully!");
     console.log("Response:", JSON.stringify(response, null, 2));

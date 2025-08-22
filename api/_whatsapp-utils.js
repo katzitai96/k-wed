@@ -2,7 +2,7 @@ const axios = require("axios");
 const { getSupabaseClient } = require("./_utils");
 
 // WhatsApp Cloud API configuration
-const WHATSAPP_API_URL = "https://graph.facebook.com/v18.0";
+const WHATSAPP_API_URL = "https://graph.facebook.com/v22.0";
 
 /**
  * Get WhatsApp Cloud API client configuration
@@ -29,16 +29,17 @@ const sendTextMessage = async (to, message) => {
   }
 
   // Remove any 'whatsapp:' prefix and ensure correct format
-  const cleanPhoneNumber = to.replace("whatsapp:", "").replace("+", "");
+  const cleanPhoneNumber = to.replace("whatsapp:", "");
 
   const payload = {
     messaging_product: "whatsapp",
     to: cleanPhoneNumber,
+    type: "text",
     text: {
       body: message,
     },
   };
-
+  console.log("Sending WhatsApp message:", JSON.stringify(payload, null, 2));
   try {
     const response = await axios.post(
       `${WHATSAPP_API_URL}/${config.phoneNumberId}/messages`,
@@ -70,7 +71,7 @@ const sendTemplateMessage = async (to, templateName, templateParams = []) => {
     );
   }
 
-  const cleanPhoneNumber = to.replace("whatsapp:", "").replace("+", "");
+  const cleanPhoneNumber = to.replace("whatsapp:", "");
 
   const payload = {
     messaging_product: "whatsapp",
@@ -79,7 +80,7 @@ const sendTemplateMessage = async (to, templateName, templateParams = []) => {
     template: {
       name: templateName,
       language: {
-        code: "en", // Adjust based on your template language
+        code: "en_US", // Adjust based on your template language
       },
       components:
         templateParams.length > 0

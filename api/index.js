@@ -13,6 +13,7 @@ if (isLocal) {
 }
 
 const app = express();
+3;
 
 // Middleware
 app.use(bodyParser.json());
@@ -176,19 +177,39 @@ app.get("/api/webhook-response", (req, res) => {
   const challenge = req.query["hub.challenge"];
   const config = getWhatsAppConfig();
   if (mode === "subscribe" && token === config.webhookVerifyToken) {
+    console.log("Webhook verified successfully");
     return res.status(200).send(challenge);
   }
   return res.status(403).send("Forbidden");
 });
 
 app.post("/api/webhook-response", async (req, res) => {
+  const timestamp = new Date().toISOString().replace("T", " ").slice(0, 19);
+  console.log(`\n\nWebhook received ${timestamp}\n`);
+  console.log(JSON.stringify(req.body, null, 2));
+
   try {
     if (!req.body) return res.status(400).send("Bad Request: Empty body");
     const entry = req.body.entry?.[0];
     const changes = entry?.changes?.[0];
     const value = changes?.value;
     if (!value || !value.messages) {
-      return res.status(200).send("OK");
+      if (value?.statuses?.length) {
+        for (const s of value.statuses) {
+          console.log("WA status:", {
+            id: s.id,
+            status: s.status, // sent, delivered, read, failed
+            timestamp: s.timestamp,
+            conversation: s.conversation, // type, id, origin
+            pricing: s.pricing, // category, billable
+            errors: s.errors, // <-- reason codes live here
+          });
+
+          // optional: persist to DB
+          // await supabase.from("wa_status").insert([{ ... }]);
+        }
+        return res.status(200).send("OK");
+      }
     }
     const message = value.messages[0];
     const contact = value.contacts?.[0];
