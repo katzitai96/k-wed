@@ -7,13 +7,13 @@ const { createClient } = require("@supabase/supabase-js");
 const path = require("path");
 
 const isLocal = process.env.VERCEL !== "1"; // Vercel injects VERCEL=1
+
 if (isLocal) {
   // allow local .env for dev only
   require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 }
 
 const app = express();
-3;
 
 // Middleware
 app.use(bodyParser.json());
