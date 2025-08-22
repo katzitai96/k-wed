@@ -272,3 +272,6 @@ app.post("/api/webhook-response", async (req, res) => {
 module.exports = (req, res) => app(req, res);
 
 // (NO app.listen here)
+app.get("/", (req, res) => res.send("Express on Vercel"));
+
+app.listen(3000, () => console.log("Server ready on port 3000."));

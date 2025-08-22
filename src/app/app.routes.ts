@@ -9,49 +9,49 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'invitees',
+    path: 'ui/invitees',
     loadComponent: () =>
       import('./components/invitee-form/invitee-list.component').then(
         (m) => m.InviteeListComponent
       ),
   },
   {
-    path: 'invitees/new',
+    path: 'ui/invitees/new',
     loadComponent: () =>
       import('./components/invitee-form/invitee-form.component').then(
         (m) => m.InviteeFormComponent
       ),
   },
   {
-    path: 'invitees/edit/:id',
+    path: 'ui/invitees/edit/:id',
     loadComponent: () =>
       import('./components/invitee-form/invitee-form.component').then(
         (m) => m.InviteeFormComponent
       ),
   },
   {
-    path: 'messages',
+    path: 'ui/messages',
     loadComponent: () =>
       import('./components/message-templates/template-list.component').then(
         (m) => m.TemplateListComponent
       ),
   },
   {
-    path: 'messages/new',
+    path: 'ui/messages/new',
     loadComponent: () =>
       import('./components/message-templates/template-form.component').then(
         (m) => m.TemplateFormComponent
       ),
   },
   {
-    path: 'messages/edit/:id',
+    path: 'ui/messages/edit/:id',
     loadComponent: () =>
       import('./components/message-templates/template-form.component').then(
         (m) => m.TemplateFormComponent
       ),
   },
   {
-    path: 'responses',
+    path: 'ui/responses',
     loadComponent: () =>
       import('./components/rsvp-responses/response-list.component').then(
         (m) => m.ResponseListComponent

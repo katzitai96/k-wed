@@ -1,7 +1,11 @@
 <div class="template-list-container">
   <div class="header">
     <h1>Message Templates</h1>
-    <button mat-raised-button color="primary" [routerLink]="['/messages/new']">
+    <button
+      mat-raised-button
+      color="primary"
+      [routerLink]="['/ui/messages/new']"
+    >
       <mat-icon>add</mat-icon> New Template
     </button>
   </div>
@@ -44,7 +48,7 @@
         <button
           mat-icon-button
           color="primary"
-          [routerLink]="['/messages/edit', template.id]"
+          [routerLink]="['/ui/messages/edit', template.id]"
           matTooltip="Edit"
         >
           <mat-icon>edit</mat-icon>
@@ -52,7 +56,7 @@
         <button
           mat-icon-button
           color="primary"
-          [routerLink]="['/messages/send', template.id]"
+          [routerLink]="['/ui/messages/send', template.id]"
           matTooltip="Send Message"
         >
           <mat-icon>send</mat-icon>
